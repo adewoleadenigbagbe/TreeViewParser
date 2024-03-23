@@ -4,6 +4,8 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Net.WebRequestMethods;
+using System.Xml.Linq;
 
 namespace ConsoleApp2
 {
@@ -21,14 +23,15 @@ namespace ConsoleApp2
         {
             try
             {
-                var attr = File.GetAttributes(path);
+                var attr = System.IO.File.GetAttributes(path);
                 if (!attr.HasFlag(FileAttributes.Directory))
                 {
                     return root;
                 }
 
-                Console.WriteLine("Adding file: {0}", path);
-                root = new Folder(path);
+                Console.WriteLine("Adding Folder: {0}", path);
+                root = new Folder(path, Directory.GetFiles(path));
+
                 foreach (var dir in Directory.GetDirectories(path))
                 {
                     var child = IterateFolders(dir, root);
@@ -55,12 +58,16 @@ namespace ConsoleApp2
     public class Folder
     {
         public string Name { get; set; }
+
+        public IEnumerable<string> Files { get; set; }
+
         public List<Folder> Folders { get; set; }
 
-        public Folder(string name)
+        public Folder(string name, IEnumerable<string> files)
         {
             Name = name;
+            Files = files;
             Folders = new List<Folder>();
         }
-    }
+   }
 }
